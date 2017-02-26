@@ -1,16 +1,13 @@
 package com.exercise.controller;
 
-import com.exercise.config.InvalidRequestException;
 import com.exercise.model.LocalRepository;
 import com.exercise.model.LocalUser;
 import com.exercise.model.RemoteRepository;
 import com.exercise.model.RemoteUser;
+import com.exercise.sevice.RepoRestService;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,36 +18,30 @@ import java.util.stream.Collectors;
 class UserRepoController {
 
     private static final String GET_LOCAL_REPOSITORIES_BY_OWNER_URL = "repositories/{owner}";
-    private static final String GET_REMOTE_REPOS_URL_BY_OWNER = "https://api.github.com/users/{owner}/repos";
-    private static final String GET_REMOTE_USER_URL = "https://api.github.com/users/{owner}";
 
     private final RepositoryConverter<LocalRepository, RemoteRepository> converter;
-    private final RestTemplate restTemplate;
+    private final RepoRestService repoRestService;
 
-    UserRepoController(RepositoryConverter<LocalRepository, RemoteRepository> converter, RestTemplate restTemplate) {
+    UserRepoController(RepositoryConverter<LocalRepository, RemoteRepository> converter, RepoRestService repoRestService) {
         this.converter = converter;
-        this.restTemplate = restTemplate;
+        this.repoRestService = repoRestService;
     }
 
     @RequestMapping(value = GET_LOCAL_REPOSITORIES_BY_OWNER_URL, method = RequestMethod.GET)
     @ResponseBody
     public LocalUser get(@PathVariable("owner") String owner,
                          @RequestParam(value = "forks", required = false, defaultValue = "false") boolean forks) throws IOException {
-        RemoteRepository[] remoteRepositories;
 
-        try {
-            remoteRepositories = restTemplate.getForEntity(GET_REMOTE_REPOS_URL_BY_OWNER, RemoteRepository[].class, owner).getBody();
-        } catch (HttpClientErrorException e) {
-            throw new InvalidRequestException("Requested URL is not available", e.getLocalizedMessage());
-        }
+        RemoteUser remoteUser = repoRestService.getUser(owner);
 
-        RemoteUser remoteUser = restTemplate.getForObject(GET_REMOTE_USER_URL, RemoteUser.class, owner);
-
-        return new LocalUser(remoteUser.getLogin(), remoteUser.getId(), getLocalRepositories(forks, remoteRepositories));
+        return new LocalUser(remoteUser.getLogin()
+                , remoteUser.getId()
+                , getLocalRepositories(forks
+                , repoRestService.getRepos(owner)));
     }
 
-    private List<LocalRepository> getLocalRepositories(boolean forks, RemoteRepository[] remoteRepositories) {
-        List<LocalRepository> localRepositories = converter.convertAll(Arrays.asList(remoteRepositories));
+    private List<LocalRepository> getLocalRepositories(boolean forks, List<RemoteRepository> remoteRepositories) {
+        List<LocalRepository> localRepositories = converter.convertAll(remoteRepositories);
         return localRepositories.stream().filter(r -> r.isFork() == forks).collect(Collectors.toList());
     }
 }

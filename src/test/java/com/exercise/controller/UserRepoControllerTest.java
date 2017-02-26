@@ -50,6 +50,7 @@ public class UserRepoControllerTest {
     private WebApplicationContext webApplicationContext;
 
 
+/*
     @Autowired
     void setConverters(HttpMessageConverter<?>[] converters) {
 
@@ -61,6 +62,7 @@ public class UserRepoControllerTest {
         assertNotNull("the JSON message converter must not be null",
                 this.mappingJackson2HttpMessageConverter);
     }
+*/
 
     @Before
     public void setup() throws Exception {
