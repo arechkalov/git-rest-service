@@ -3,7 +3,6 @@ package com.exercise.config;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -21,10 +20,10 @@ import java.util.Map;
 @RestControllerAdvice
 public class ServiceExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler(InvalidRequestException.class)
     @ResponseBody
-    ResponseEntity<Object> handleNotFoundException(HttpServletRequest req, Exception ex) {
-        ErrorInfo errorResponse = new ErrorInfo(req.getRequestURL().toString(), ex);
+    ResponseEntity<Object> handleNotFoundException(HttpServletRequest req, InvalidRequestException ex) {
+        ErrorInfo errorResponse = new ErrorInfo(ex.getLocalizedMessage(), req.getRequestURL().toString());
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

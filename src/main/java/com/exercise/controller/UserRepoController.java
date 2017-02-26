@@ -36,18 +36,21 @@ class UserRepoController {
     @ResponseBody
     public LocalUser get(@PathVariable("owner") String owner,
                          @RequestParam(value = "forks", required = false, defaultValue = "false") boolean forks) throws IOException {
-        try {
+        RemoteRepository[] remoteRepositories;
 
-            RemoteRepository[] remoteRepositories = restTemplate.getForEntity(GET_REMOTE_REPOS_URL_BY_OWNER, RemoteRepository[].class, owner).getBody();
+        try {
+            remoteRepositories = restTemplate.getForEntity(GET_REMOTE_REPOS_URL_BY_OWNER, RemoteRepository[].class, owner).getBody();
         } catch (HttpClientErrorException e) {
-            throw new InvalidRequestException(e.  )
+            throw new InvalidRequestException("Requested URL is not available", e.getLocalizedMessage());
         }
 
         RemoteUser remoteUser = restTemplate.getForObject(GET_REMOTE_USER_URL, RemoteUser.class, owner);
 
-        List<LocalRepository> localRepositories = converter.convertAll(Arrays.asList(remoteRepositories));
-        List<LocalRepository> filteredRepos = localRepositories.stream().filter(r -> r.isFork() == forks).collect(Collectors.toList());
+        return new LocalUser(remoteUser.getLogin(), remoteUser.getId(), getLocalRepositories(forks, remoteRepositories));
+    }
 
-        return new LocalUser(remoteUser.getLogin(), remoteUser.getId(), filteredRepos);
+    private List<LocalRepository> getLocalRepositories(boolean forks, RemoteRepository[] remoteRepositories) {
+        List<LocalRepository> localRepositories = converter.convertAll(Arrays.asList(remoteRepositories));
+        return localRepositories.stream().filter(r -> r.isFork() == forks).collect(Collectors.toList());
     }
 }

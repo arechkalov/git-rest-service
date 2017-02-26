@@ -3,12 +3,20 @@ package com.exercise.config;
 /**
  * Created by arecicalov on 2/20/2017.
  */
-public class ErrorInfo {
+class ErrorInfo {
+    private final String description;
     private final String url;
-    private final String ex;
 
-    public ErrorInfo(String url, Exception ex) {
+    public ErrorInfo(String description, String url) {
+        this.description = description;
         this.url = url;
-        this.ex = ex.getLocalizedMessage();
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getUrl() {
+        return url;
     }
 }
