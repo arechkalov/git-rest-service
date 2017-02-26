@@ -9,7 +9,7 @@ import java.io.Serializable;
  * Created by arecicalov on 2/20/2017.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RequestRepository implements Serializable {
+public class RemoteRepository implements Serializable {
     private static final long serialVersionUID = 32989453541L;
 
     @JsonProperty(value = "full_name")
@@ -23,18 +23,18 @@ public class RequestRepository implements Serializable {
     @JsonProperty(value = "fork")
     private boolean isFork;
     @JsonProperty(value = "owner")
-    private RequestOwner requestOwner;
+    private RemoteUser remoteUser;
 
-    public RequestRepository() {
+    public RemoteRepository() {
     }
 
-    public RequestRepository(String fullName, String description, String cloneUrl, String createdAt, boolean isFork, RequestOwner requestOwner) {
+    public RemoteRepository(String fullName, String description, String cloneUrl, String createdAt, boolean isFork, RemoteUser remoteUser) {
         this.fullName = fullName;
         this.description = description;
         this.cloneUrl = cloneUrl;
         this.createdAt = createdAt;
         this.isFork = isFork;
-        this.requestOwner = requestOwner;
+        this.remoteUser = remoteUser;
     }
 
     public String getFullName() {
@@ -57,8 +57,8 @@ public class RequestRepository implements Serializable {
         return isFork;
     }
 
-    public RequestOwner getRequestOwner() {
-        return requestOwner;
+    public RemoteUser getRemoteUser() {
+        return remoteUser;
     }
 
     public void setFullName(String fullName) {
@@ -81,7 +81,7 @@ public class RequestRepository implements Serializable {
         isFork = fork;
     }
 
-    public void setRequestOwner(RequestOwner requestOwner) {
-        this.requestOwner = requestOwner;
+    public void setRemoteUser(RemoteUser remoteUser) {
+        this.remoteUser = remoteUser;
     }
 }

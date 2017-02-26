@@ -8,15 +8,15 @@ import java.util.List;
 /**
  * Created by arecicalov on 2/20/2017.
  */
-public class ResponseUser implements Serializable {
+public class LocalUser implements Serializable {
     private static final long serialVersionUID = -298477062934L;
 
     private final String userName;
     private final String gitHubId;
-    private final List<ResponseRepository> repositories;
+    private final List<LocalRepository> repositories;
 
     @JsonCreator
-    public ResponseUser(String userName, String gitHubId, List<ResponseRepository> repositories) {
+    public LocalUser(String userName, String gitHubId, List<LocalRepository> repositories) {
         this.userName = userName;
         this.gitHubId = gitHubId;
         this.repositories = repositories;
@@ -30,7 +30,7 @@ public class ResponseUser implements Serializable {
         return gitHubId;
     }
 
-    public List<ResponseRepository> getRepositories() {
+    public List<LocalRepository> getRepositories() {
         return repositories;
     }
 }

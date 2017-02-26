@@ -1,11 +1,8 @@
 package com.exercise.controller;
 
 import com.exercise.app.Application;
-import com.exercise.model.RequestOwner;
-import com.exercise.model.RequestRepository;
-import com.exercise.service.JsonParser;
-import com.exercise.service.RepositoryService;
-import com.exercise.service.UserService;
+import com.exercise.model.RemoteRepository;
+import com.exercise.model.RemoteUser;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,15 +52,6 @@ public class UserRepoControllerTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    @MockBean
-    private JsonParser jsonParser;
-
-    @Autowired
-    private RepositoryService repositoryService;
-
-    @Autowired
-    private UserService userService;
-
 
     @Autowired
     void setConverters(HttpMessageConverter<?>[] converters) {
@@ -84,45 +72,40 @@ public class UserRepoControllerTest {
 
     @Test
     public void getUsersRepositories() throws Exception {
-        RequestOwner requestOwner = new RequestOwner("userName", "gitHubId");
+        RemoteUser remoteUser = new RemoteUser("userName", "gitHubId");
 
-        URL url = new URL(String.format("https://localhost:8080/repositories/%s", requestOwner.getLogin()));
+        URL url = new URL(String.format("https://localhost:8080/repositories/%s", remoteUser.getLogin()));
 
         String createdAt = "2015-05-18T19:06:24Z";
 
-        RequestRepository requestRepository = new RequestRepository();
-        requestRepository.setFullName("fullName");
-        requestRepository.setCloneUrl("cloneUrl");
-        requestRepository.setCreatedAt(createdAt);
-        requestRepository.setDescription("description");
-        requestRepository.setFork(false);
-        requestRepository.setRequestOwner(requestOwner);
+        RemoteRepository remoteRepository = new RemoteRepository();
+        remoteRepository.setFullName("fullName");
+        remoteRepository.setCloneUrl("cloneUrl");
+        remoteRepository.setCreatedAt(createdAt);
+        remoteRepository.setDescription("description");
+        remoteRepository.setFork(false);
+        remoteRepository.setRemoteUser(remoteUser);
 
         ZonedDateTime zonedDateTime = ZonedDateTime.parse(createdAt);
         String formattedDateTime = zonedDateTime.format(formatter);
 
-        given(jsonParser.parseJsonFromUrl(new URL(String.format("https://api.github.com/users/%s/repos", requestOwner.getLogin()))))
-                .willReturn(Collections.singletonList(requestRepository));
 
         mockMvc.perform(get(url.toURI()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$.userName", is(requestOwner.getLogin())))
-                .andExpect(jsonPath("$.gitHubId", is(requestOwner.getId())))
-                .andExpect(jsonPath("$.repositories[0].fullName", is(requestRepository.getFullName())))
-                .andExpect(jsonPath("$.repositories[0].description", is(requestRepository.getDescription())))
-                .andExpect(jsonPath("$.repositories[0].cloneUrl", is(requestRepository.getCloneUrl())))
+                .andExpect(jsonPath("$.userName", is(remoteUser.getLogin())))
+                .andExpect(jsonPath("$.gitHubId", is(remoteUser.getId())))
+                .andExpect(jsonPath("$.repositories[0].fullName", is(remoteRepository.getFullName())))
+                .andExpect(jsonPath("$.repositories[0].description", is(remoteRepository.getDescription())))
+                .andExpect(jsonPath("$.repositories[0].cloneUrl", is(remoteRepository.getCloneUrl())))
                 .andExpect(jsonPath("$.repositories[0].createdAt", is(formattedDateTime)))
-                .andExpect(jsonPath("$.repositories[0].fork", is(requestRepository.isFork())));
+                .andExpect(jsonPath("$.repositories[0].fork", is(remoteRepository.isFork())));
     }
 
     @Test
     public void noRepositoriesFound() throws Exception {
-        RequestOwner requestOwner = new RequestOwner("userName", "gitHubId");
-        URL url = new URL(String.format("https://localhost:8080/repositories/%s", requestOwner.getLogin()));
-
-        given(jsonParser.parseJsonFromUrl(new URL(String.format("https://api.github.com/users/%s/repos", requestOwner.getLogin()))))
-                .willReturn(Collections.emptyList());
+        RemoteUser remoteUser = new RemoteUser("userName", "gitHubId");
+        URL url = new URL(String.format("https://localhost:8080/repositories/%s", remoteUser.getLogin()));
 
         mockMvc.perform(get(url.toURI()))
                 .andExpect(status().isNoContent());

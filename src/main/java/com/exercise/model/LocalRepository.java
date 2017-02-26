@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * Created by arecicalov on 2/20/2017.
  */
-public class ResponseRepository implements Serializable {
+public class LocalRepository implements Serializable {
     private static final long serialVersionUID = -392847924792L;
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss").withZone(ZoneId.systemDefault());
 
@@ -21,7 +21,7 @@ public class ResponseRepository implements Serializable {
     private final boolean isFork;
 
     @JsonCreator
-    public ResponseRepository(String fullName, String description, String cloneUrl, String createdAt, boolean isFork) {
+    public LocalRepository(String fullName, String description, String cloneUrl, String createdAt, boolean isFork) {
 
         ZonedDateTime zonedDateTime = ZonedDateTime.parse(createdAt);
         String formattedDateTime = zonedDateTime.format(formatter);
