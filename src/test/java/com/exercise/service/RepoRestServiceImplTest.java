@@ -168,12 +168,12 @@ public class RepoRestServiceImplTest {
 
     @Test(expected = HttpMessageNotReadableException.class)
     public void testGetUserParseFailed() {
-        String body = "unparsablestring";
+        String body = "unparsable string";
 
         mockServer.expect(requestTo("https://api.github.com/users/owner")).andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess(body, MediaType.APPLICATION_JSON));
 
-        RemoteUser owner = repoRestService.getUser("owner");
+        repoRestService.getUser("owner");
 
         mockServer.verify();
     }
