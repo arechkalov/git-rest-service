@@ -1,9 +1,9 @@
 # git-rest-service
 Service which shows user's repositories.
 
-#README
+# README
 
-#What is this repository for?
+# What is this repository for?
 * A simple REST service which returns details of all publicly available user repositories.
 * Version 1.0
 * Learn Markdown
